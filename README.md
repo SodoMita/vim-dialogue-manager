@@ -1,0 +1,1 @@
+# vim-dialogue-manager
