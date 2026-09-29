@@ -1,0 +1,10 @@
+; Minimal Godot project so that the res:// import and the "using" autoload in
+; example.dialogue resolve. Drop the addons/dialogue_manager addon in here to
+; try the example in the actual editor.
+[application]
+
+config/name="vim-dialogue-manager example"
+
+[autoload]
+
+GameState="*res://game_state.gd"

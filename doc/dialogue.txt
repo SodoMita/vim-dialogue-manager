@@ -1,0 +1,223 @@
+*dialogue.txt*	Support for Godot Dialogue Manager dialogue files
+
+Author: vim-dialogue-manager contributors
+License: MIT
+
+==============================================================================
+CONTENTS					*dialogue-contents*
+
+1. Intro ......................... |dialogue-intro|
+2. Requirements .................. |dialogue-requirements|
+3. Commands ...................... |dialogue-commands|
+4. Mappings ...................... |dialogue-mappings|
+5. Folding and indenting ......... |dialogue-folding|
+6. Completion .................... |dialogue-completion|
+7. Checking files ................ |dialogue-check|
+8. Options ....................... |dialogue-options|
+9. Highlighting groups ........... |dialogue-groups|
+10. Credits ...................... |dialogue-credits|
+
+==============================================================================
+1. Intro						*dialogue-intro*
+
+This plugin adds support for the dialogue files used by Nathan Hoad's
+Dialogue Manager addon for Godot (https://github.com/nathanhoad/godot_dialogue_manager)
+to Vim and Neovim:
+
+	- Syntax highlighting for Dialogue Manager 4 (cues, jumps, condition
+	  blocks, mutations, weighted random lines, tags, imports, "using"
+	  states) and the still-supported 3.x syntax ("~ titles", "do"/"set"
+	  mutations, "[if condition]" response conditions, static line ids).
+	- Indenting that follows the compiler's own indentation rules.
+	- Folding by ~ cue with nested folds for response branches and
+	  condition blocks.
+	- Navigation between cues and to cue definitions.
+	|dialogue-commands|
+	- A built-in linter that re-implements the compiler's structural
+	  checks, so you can catch errors without launching Godot.
+
+Files are detected by extension: *.dialogue.
+
+==============================================================================
+2. Requirements					*dialogue-requirements*
+
+Vim 8.0+ or Neovim. Compiled with |+eval| (normal builds have it). No
+external dependencies — even the linter is plain Vimscript.
+
+==============================================================================
+3. Commands					*dialogue-commands*
+
+These commands are available in *.dialogue buffers:
+
+	:DialogueCues		Populate the quickfix list with every cue in
+				the file and open it.
+
+	:DialogueCheck		Run the built-in linter
+				(|dialogue-check|) and put anything it finds
+				in the quickfix list.
+
+	:DialogueCheck!		Same, but close the quickfix window first.
+
+==============================================================================
+4. Mappings					*dialogue-mappings*
+
+	]]			Jump to the next ~ cue.
+	[[			Jump to the previous ~ cue.
+
+	gd			Jump to the definition of the cue referenced
+				on the current line ("=> cue", "=>< cue" or
+				"prefix/cue" from an import). If the target
+				lives in an imported file, that file is
+				opened at the cue.
+
+Set |g:dialogue_no_mappings| to disable them.
+
+==============================================================================
+5. Folding and indenting				*dialogue-folding*
+
+Folding (~)						*dialogue-fold*
+
+Each "~ cue" line starts a fold that ends at the next cue. Response
+branches ("- ...") and condition blocks (if/while/match) fold when they
+have nested lines. Set |g:dialogue_folding| to 0 to disable.
+
+Indenting						*dialogue-indent*
+
+The Dialogue Manager counts indentation in tabs (or groups of 4 or 2
+spaces) — one level per token — and rejects lines that jump more than one
+level deeper than their parent. The indentexpr follows the same rules:
+
+	- Lines under if/elif/else/while/match/when and bare "%" random
+	  blocks are always indented one level.
+	- Dialogue typed after a response is indented as that response's
+	  branch; a new "-" response aligns with its siblings (or nests one
+	  level under them when you indented it that way).
+	- A response that ends in a jump ("- ... => cue") can never have a
+	  branch, so whatever follows it exits the response list.
+	- elif/else/when align with their opening if/match.
+	- Cues, imports and "using" lines stay at the left margin.
+	- Any other line keeps the indent it already has when that is
+	  structurally possible (nothing may be more than one level deeper
+	  than the line above it); only over-deep lines are pulled back.
+	  Re-indenting a valid file with |==| or |gg=G| is therefore a no-op,
+	  and an explicit dedent is always respected.
+
+The buffer's indent style (tabs / 4 spaces / 2 spaces) is detected from
+the file. The plugin sets 'tabstop' and 'shiftwidth' to 4 to match the
+Dialogue Manager editor; set |g:dialogue_indent| to 0 to keep your own.
+
+==============================================================================
+6. Completion					*dialogue-completion*
+
+|i_CTRL-X_CTRL-O| completes cue names after "=> " and "=>< ":
+
+	=> star<C-X><C-O>	=> all cues starting with "star"
+	=> snippets/<C-X><C-O>	all cues imported as "snippets"
+
+"END" and "END!" are included.
+
+==============================================================================
+7. Checking files					*dialogue-check*
+
+							*:DialogueCheck*
+:DialogueCheck runs a pure-Vimscript linter that re-implements the
+compiler's structural checks:
+
+	- Unknown jump targets (=> cue that doesn't exist), including
+	  "prefix/cue" targets from imports
+	- Duplicate and invalid cue names
+	- Invalid indentation (more than one level deeper than the parent)
+	- Condition/match/while blocks with no content
+	- "when" lines outside a match block
+	- Concurrent "| " lines with no dialogue line to run with
+	- Duplicate and orphaned "[ID:...]" static line ids
+	- Malformed or duplicate imports
+
+Imported files (import "...") are read to resolve "prefix/cue" targets
+when they live under the same project.
+
+Checking with the real compiler				*dialogue-compiler*
+
+For the full compiler, copy tools/dialogue_check.gd from this plugin
+into your Godot project and configure: >
+
+	let g:dialogue_makeprg =
+	  \ 'godot --headless --path . -s dialogue_check.gd -- %:p'
+
+	:compiler dialogue
+	:make
+
+Any command printing "file:line:column: message" can be used as
+g:dialogue_makeprg.
+
+==============================================================================
+8. Options					*dialogue-options*
+
+					*g:dialogue_no_mappings*
+g:dialogue_no_mappings
+	When set (any value), no buffer-local mappings are created.
+
+					*g:dialogue_folding*
+g:dialogue_folding	(default: 1)
+	Set to 0 to disable foldmethod/foldexpr setup.
+
+					*g:dialogue_indent*
+g:dialogue_indent	(default: 1)
+	Set to 0 to keep your own 'tabstop'/'shiftwidth' settings.
+
+					*g:dialogue_makeprg*
+g:dialogue_makeprg
+	Command used by |:make| after `:compiler dialogue`. See
+	|dialogue-compiler|.
+
+==============================================================================
+9. Highlighting groups				*dialogue-groups*
+
+All groups can be re-linked after the colorscheme loads, e.g.: >
+
+	highlight link dialogueCharacter Comment
+
+	dialogueCue			cue lines ("~ name")
+	dialogueResponse		response markers ("- ")
+	dialogueConcurrent		concurrent markers ("| ")
+	dialogueRandom			weighted-random prefixes ("%", "%3")
+	dialogueInlineRandom		"[[this|or that]]"
+	dialogueCharacter		character names ("Nathan:")
+	dialogueJumpArrow		jump arrows ("=>", "=><")
+	dialogueJumpTarget		jump targets
+	dialogueJumpEnd			END / END!
+	dialogueConditionKeyword	if/elif/else/while/match/when
+	dialogueMutationKeyword		$> / $>> / do / set
+	dialogueWrappedCondition	"[if ... /]" response conditions
+	dialogueInlineCondition		"[if ...]" inline conditionals
+	dialogueInlineMutation		"[$> ...]" inline mutations
+	dialogueLineID			"[ID:...]" static ids
+	dialogueTag			"[#tag]" tags
+	dialogueBBCode			"[b]", "[wait=2]", ...
+	dialogueInterpolation		"{{...}}" interpolation
+	dialogueImportKeyword		"import"
+	dialogueImportPath		quoted import paths
+	dialogueImportAs		"as"
+	dialogueImportPrefix		import prefixes
+	dialogueUsingKeyword		"using"
+	dialogueUsingState		state names after "using"
+	dialogueComment			"#" comments
+	dialogueTranslatorNote		"##" translator notes
+	dialogueEscape			"\if" style escapes
+	dialogueSeparator		"====" separator lines
+	dialogueString			strings inside expressions
+	dialogueNumber			numbers inside expressions
+	dialogueBoolean			true/false
+	dialogueLogical			and/or/not/in
+	dialogueOperator		operators inside expressions
+	dialogueFunctionCall		function calls inside expressions
+	dialogueIdentifier		identifiers inside expressions
+
+==============================================================================
+10. Credits						*dialogue-credits*
+
+Syntax, indentation and lint rules mirror the compiler of Godot Dialogue
+Manager by Nathan Hoad (MIT license):
+https://github.com/nathanhoad/godot_dialogue_manager
+
+ vim: nowrap tw=78 ts=8 sw=2 sts=2 noet

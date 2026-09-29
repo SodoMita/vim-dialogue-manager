@@ -1,0 +1,6 @@
+# An import that does not exist anywhere.
+import "res://does/not/exist.dialogue" as missing
+
+~ start
+Nathan: Hello.
+=> END

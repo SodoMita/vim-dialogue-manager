@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>~/vim-dialogue-manager/examples/example.dialogue.html</title>
+<meta name="Generator" content="Vim/9.1">
+<meta name="plugin-version" content="vim9.0_v2">
+<meta name="syntax" content="dialogue">
+<meta name="settings" content="no_progress,number_lines,use_css,no_foldcolumn,expand_tabs,line_ids,pre_wrap,prevent_copy=,use_input_for_pc=none">
+<meta name="colorscheme" content="desert">
+<style>
+<!--
+pre { white-space: pre-wrap; font-family: monospace; color: #ffffff; background-color: #000000; }
+body { font-family: monospace; color: #ffffff; background-color: #000000; }
+* { font-size: 1em; }
+a { color: inherit; }
+.Statement { color: #00ffff; }
+.Comment { color: #ffff00; font-weight: bold; }
+.Special { color: #8080ff; }
+.LineNr { color: #00ffff; }
+.Identifier { color: #ffff00; }
+.Underlined { color: #ff6060; text-decoration: underline; }
+.PreProc { color: #ff6060; }
+.Title { color: #ff40ff; }
+.Type { color: #00ff00; }
+.Constant { color: #ff40ff; }
+-->
+</style>
+
+<script>
+<!--
+
+/* function to open any folds containing a jumped-to line before jumping to it */
+function JumpToLine()
+{
+  var lineNum;
+  lineNum = window.location.hash;
+  lineNum = lineNum.substr(1); /* strip off '#' */
+
+  if (lineNum.indexOf('L') == -1) {
+    lineNum = 'L'+lineNum;
+  }
+  var lineElem = document.getElementById(lineNum);
+  /* Always jump to new location even if the line was hidden inside a fold, or
+   * we corrected the raw number to a line ID.
+   */
+  if (lineElem) {
+    lineElem.scrollIntoView(true);
+  }
+  return true;
+}
+if ('onhashchange' in window) {
+  window.onhashchange = JumpToLine;
+}
+
+-->
+</script>
+</head>
+<body onload='JumpToLine();'>
+<pre id='vimCodeElement'>
+<span id="L1" class="LineNr"> 1 </span><span class="Comment"># Godot Dialogue Manager 4 — syntax showcase</span>
+<span id="L2" class="LineNr"> 2 </span><span class="Comment">#</span>
+<span id="L3" class="LineNr"> 3 </span><span class="Comment"># In your own project the .dialogue extension sets the filetype automatically.</span>
+<span id="L4" class="LineNr"> 4 </span><span class="Comment"># This file is also used by the plugin's test suite.</span>
+<span id="L5" class="LineNr"> 5 </span>
+<span id="L6" class="LineNr"> 6 </span><span class="Special">## This note is exported as a translators' note (## prefix)</span>
+<span id="L7" class="LineNr"> 7 </span>
+<span id="L8" class="LineNr"> 8 </span><span class="Statement">import</span> <span class="Constant">&quot;res://levels/town/snippets.dialogue&quot;</span> <span class="Statement">as</span> <span class="Identifier">snippets</span>
+<span id="L9" class="LineNr"> 9 </span>
+<span id="L10" class="LineNr">10 </span><span class="Statement">using</span> <span class="Identifier">GameState</span>
+<span id="L11" class="LineNr">11 </span>
+<span id="L12" class="LineNr">12 </span><span class="Title">~ start</span>
+<span id="L13" class="LineNr">13 </span>
+<span id="L14" class="LineNr">14 </span><span class="Type">Nathan</span>: Hey, welcome to the Dialogue Manager! <span class="Underlined">[ID:WELCOME]</span>
+<span id="L15" class="LineNr">15 </span><span class="Type">Nathan</span>: I can speak in <span class="Special">[b]</span>bold<span class="Special">[/b]</span>, <span class="Special">[i]</span>italics<span class="Special">[/i]</span>, or <span class="Special">[color=red]</span>colour<span class="Special">[/color]</span>.
+<span id="L16" class="LineNr">16 </span><span class="Type">Nathan</span>: I can pick <span class="Special">[[this|or this|or even this]]</span> at random.
+<span id="L17" class="LineNr">17 </span><span class="Type">Nathan</span>: You have <span class="Statement">{{</span><span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">apple_count</span><span class="Statement">}}</span> <span class="Statement">[if GameState.apple_count == 1]</span>apple<span class="Statement">[else]</span>apples<span class="Statement">[/if]</span>!
+<span id="L18" class="LineNr">18 </span><span class="Type">Nathan</span>: Pauses are easy: <span class="Special">[wait=1]</span>...<span class="Special">[speed=3]</span>and now I'm talking faster!<span class="Special">[speed=1]</span>
+<span id="L19" class="LineNr">19 </span><span class="Type">Nathan</span>: Things can happen <span class="Statement">[</span><span class="Identifier">$</span><span class="Statement">&gt;</span><span class="Identifier"> </span><span class="Identifier">emote</span><span class="Statement">(</span><span class="Constant">&quot;wave&quot;</span><span class="Statement">)]</span>right in the middle of a line.
+<span id="L20" class="LineNr">20 </span><span class="Type">Coco</span>: Meow.
+<span id="L21" class="LineNr">21 </span>
+<span id="L22" class="LineNr">22 </span><span class="Comment"># Simultaneous dialogue</span>
+<span id="L23" class="LineNr">23 </span><span class="Type">Nathan</span>: This is a regular line of dialogue.
+<span id="L24" class="LineNr">24 </span><span class="Special">| </span><span class="Type">Coco</span>: And I'll say this line at the same time!
+<span id="L25" class="LineNr">25 </span><span class="Special">| </span><span class="Type">{{GameState.other_speaker}}</span>: Even my name can come from a variable.
+<span id="L26" class="LineNr">26 </span>
+<span id="L27" class="LineNr">27 </span><span class="Comment"># Weighted random lines</span>
+<span id="L28" class="LineNr">28 </span><span class="Type">Nathan</span>: I will always say this.
+<span id="L29" class="LineNr">29 </span><span class="Constant">%</span> <span class="Type">Nathan</span>: And then I might say this
+<span id="L30" class="LineNr">30 </span><span class="Constant">%3</span> <span class="Type">Nathan</span>: This one is three times as likely as the line above
+<span id="L31" class="LineNr">31 </span><span class="Constant">%</span> <span class="Type">Nathan</span>: Or maybe this
+<span id="L32" class="LineNr">32 </span>
+<span id="L33" class="LineNr">33 </span><span class="Comment"># Random blocks</span>
+<span id="L34" class="LineNr">34 </span><span class="Constant">%</span>
+<span id="L35" class="LineNr">35 </span><span class="Type">    Nathan</span>: This is the first random block.
+<span id="L36" class="LineNr">36 </span><span class="Type">    Nathan</span>: Still the first block.
+<span id="L37" class="LineNr">37 </span><span class="Constant">%</span> <span class="Type">Nathan</span>: This is the other possible outcome.
+<span id="L38" class="LineNr">38 </span>
+<span id="L39" class="LineNr">39 </span><span class="Statement">if</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">has_met_nathan</span> <span class="Statement">==</span> <span class="Constant">false</span>
+<span id="L40" class="LineNr">40 </span>    <span class="Identifier">$&gt;</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">animate</span><span class="Statement">(</span><span class="Constant">&quot;Nathan&quot;</span><span class="Statement">,</span> <span class="Constant">&quot;Wave&quot;</span><span class="Statement">)</span>
+<span id="L41" class="LineNr">41 </span><span class="Type">    Nathan</span>: Hi, I'm Nathan.
+<span id="L42" class="LineNr">42 </span>    <span class="Identifier">$&gt;</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">has_met_nathan</span> <span class="Statement">=</span> <span class="Constant">true</span>
+<span id="L43" class="LineNr">43 </span>
+<span id="L44" class="LineNr">44 </span><span class="Type">Nathan</span>: What would you like to know?
+<span id="L45" class="LineNr">45 </span>
+<span id="L46" class="LineNr">46 </span><span class="Statement">- </span>Tell me more about this dialogue editor <span class="Statement">[if</span> not GameState.asked_editor<span class="Statement"> /]</span>
+<span id="L47" class="LineNr">47 </span>    <span class="Identifier">$&gt;</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">asked_editor</span> <span class="Statement">=</span> <span class="Constant">true</span>
+<span id="L48" class="LineNr">48 </span><span class="Type">    Nathan</span>: Well, you write dialogue like a script...
+<span id="L49" class="LineNr">49 </span>    <span class="PreProc">=&gt;&lt;</span> <span class="Type">snippets/banter</span>
+<span id="L50" class="LineNr">50 </span><span class="Type">    Nathan</span>: ...and that was some imported banter!
+<span id="L51" class="LineNr">51 </span><span class="Statement">- </span>What's your favourite colour?
+<span id="L52" class="LineNr">52 </span>    <span class="Statement">if</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">favourite_colour</span> <span class="Statement">==</span> <span class="Identifier">null</span>
+<span id="L53" class="LineNr">53 </span><span class="Type">        Nathan</span>: I'd say blue. It's calming.
+<span id="L54" class="LineNr">54 </span>    <span class="Statement">else</span>
+<span id="L55" class="LineNr">55 </span><span class="Type">        Nathan</span>: I already told you — it's blue!
+<span id="L56" class="LineNr">56 </span>    <span class="Statement">- </span>Blue <span class="Statement">[if</span> GameState.favourite_colour == &quot;blue&quot;<span class="Statement"> /]</span>
+<span id="L57" class="LineNr">57 </span><span class="Type">        Nathan</span>: Great minds think alike!
+<span id="L58" class="LineNr">58 </span>    <span class="Statement">- </span>Something else <span class="PreProc">=&gt;</span> <span class="Type">start</span>
+<span id="L59" class="LineNr">59 </span><span class="Statement">- </span>Nothing, thanks <span class="PreProc">=&gt;</span> <span class="Statement">END</span>
+<span id="L60" class="LineNr">60 </span>
+<span id="L61" class="LineNr">61 </span><span class="Statement">match</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">question_count</span>
+<span id="L62" class="LineNr">62 </span>    <span class="Statement">when</span> <span class="Constant">0</span>
+<span id="L63" class="LineNr">63 </span><span class="Type">        Nathan</span>: You haven't asked anything yet!
+<span id="L64" class="LineNr">64 </span>    <span class="Statement">when</span> <span class="Statement">&gt;</span> <span class="Constant">5</span>
+<span id="L65" class="LineNr">65 </span><span class="Type">        Nathan</span>: Wow, you're full of questions.
+<span id="L66" class="LineNr">66 </span>    <span class="Statement">else</span>
+<span id="L67" class="LineNr">67 </span><span class="Type">        Nathan</span>: Keep them coming.
+<span id="L68" class="LineNr">68 </span>
+<span id="L69" class="LineNr">69 </span><span class="Statement">while</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">question_count</span> <span class="Statement">&lt;</span> <span class="Constant">3</span>
+<span id="L70" class="LineNr">70 </span><span class="Type">    Nathan</span>: The count is <span class="Statement">{{</span><span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">question_count</span><span class="Statement">}}</span>.
+<span id="L71" class="LineNr">71 </span>    <span class="Identifier">$&gt;</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">question_count</span> <span class="Statement">+=</span> <span class="Constant">1</span>
+<span id="L72" class="LineNr">72 </span>
+<span id="L73" class="LineNr">73 </span><span class="Comment"># v3-style lines still work (set/do are deprecated in favour of $&gt;)</span>
+<span id="L74" class="LineNr">74 </span><span class="Identifier">set</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">counter</span> <span class="Statement">=</span> <span class="Identifier">GameState</span><span class="Statement">.</span><span class="Identifier">counter</span> <span class="Statement">+</span> <span class="Constant">1</span>
+<span id="L75" class="LineNr">75 </span><span class="Identifier">do</span> <span class="Identifier">something_here</span><span class="Statement">()</span>
+<span id="L76" class="LineNr">76 </span>
+<span id="L77" class="LineNr">77 </span><span class="Type">Nathan</span>: That's everything! <span class="Special">[next=auto]</span>
+<span id="L78" class="LineNr">78 </span><span class="PreProc">=&gt;</span> <span class="Statement">END</span>
+<span id="L79" class="LineNr">79 </span>
+<span id="L80" class="LineNr">80 </span><span class="Title">~ second_cue</span>
+<span id="L81" class="LineNr">81 </span><span class="Type">Nathan</span>: You can jump straight to a cue, too.
+<span id="L82" class="LineNr">82 </span><span class="PreProc">=&gt;</span> <span class="Statement">END!</span>
+</pre>
+</body>
+</html>
+<!-- vim: set foldmethod=manual : -->

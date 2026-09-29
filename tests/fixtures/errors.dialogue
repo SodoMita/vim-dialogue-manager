@@ -1,0 +1,20 @@
+# Fixture for the linter tests — every error here is deliberate.
+~ start
+Nathan: Hi there
+=> missing_cue
+| Nathan: This concurrent line follows a jump, not a dialogue line
+~ start
+if GameState.difficulty
+Nathan: This if-block has no content, so it is an error
+when 5
+Nathan: This "when" does not belong to a match
+		Nathan: This line is two indents deeper than allowed
+Nathan: I have an id [ID:MY_ID]
+Nathan: Mine is a duplicate [ID:MY_ID]
+[ID:LONELY_ID]
+import "res://snippets.dialogue" as snippets
+import "res://other.dialogue" as snippets
+~ 2_numbers_first
+Nathan: Jumping to a cue in an import that doesn't exist => snippets/nope
+Nathan: Bye
+=> END

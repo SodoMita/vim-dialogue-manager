@@ -1,0 +1,82 @@
+# Godot Dialogue Manager 4 — syntax showcase
+#
+# In your own project the .dialogue extension sets the filetype automatically.
+# This file is also used by the plugin's test suite.
+
+## This note is exported as a translators' note (## prefix)
+
+import "res://levels/town/snippets.dialogue" as snippets
+
+using GameState
+
+~ start
+
+Nathan: Hey, welcome to the Dialogue Manager! [ID:WELCOME]
+Nathan: I can speak in [b]bold[/b], [i]italics[/i], or [color=red]colour[/color].
+Nathan: I can pick [[this|or this|or even this]] at random.
+Nathan: You have {{GameState.apple_count}} [if GameState.apple_count == 1]apple[else]apples[/if]!
+Nathan: Pauses are easy: [wait=1]...[speed=3]and now I'm talking faster![speed=1]
+Nathan: Things can happen [$> emote("wave")]right in the middle of a line.
+Coco: Meow.
+
+# Simultaneous dialogue
+Nathan: This is a regular line of dialogue.
+| Coco: And I'll say this line at the same time!
+| {{GameState.other_speaker}}: Even my name can come from a variable.
+
+# Weighted random lines
+Nathan: I will always say this.
+% Nathan: And then I might say this
+%3 Nathan: This one is three times as likely as the line above
+% Nathan: Or maybe this
+
+# Random blocks
+%
+	Nathan: This is the first random block.
+	Nathan: Still the first block.
+% Nathan: This is the other possible outcome.
+
+if GameState.has_met_nathan == false
+	$> GameState.animate("Nathan", "Wave")
+	Nathan: Hi, I'm Nathan.
+	$> GameState.has_met_nathan = true
+
+Nathan: What would you like to know?
+
+- Tell me more about this dialogue editor [if not GameState.asked_editor /]
+	$> GameState.asked_editor = true
+	Nathan: Well, you write dialogue like a script...
+	=>< snippets/banter
+	Nathan: ...and that was some imported banter!
+- What's your favourite colour?
+	if GameState.favourite_colour == null
+		Nathan: I'd say blue. It's calming.
+	else
+		Nathan: I already told you — it's blue!
+	- Blue [if GameState.favourite_colour == "blue" /]
+		Nathan: Great minds think alike!
+	- Something else => start
+- Nothing, thanks => END
+
+match GameState.question_count
+	when 0
+		Nathan: You haven't asked anything yet!
+	when > 5
+		Nathan: Wow, you're full of questions.
+	else
+		Nathan: Keep them coming.
+
+while GameState.question_count < 3
+	Nathan: The count is {{GameState.question_count}}.
+	$> GameState.question_count += 1
+
+# v3-style lines still work (set/do are deprecated in favour of $>)
+set GameState.counter = GameState.counter + 1
+do something_here()
+
+Nathan: That's everything! [next=auto]
+=> END
+
+~ second_cue
+Nathan: You can jump straight to a cue, too.
+=> END!
