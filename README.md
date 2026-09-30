@@ -68,25 +68,25 @@ structural errors, and `examples/example.dialogue` compiles cleanly.
 
 ```vim
 Plug 'nathanhoad/godot_dialogue_manager'  " (optional, in your game repo as a submodule)"
-Plug 'yourname/vim-dialogue-manager'
+Plug 'SodoMita/vim-dialogue-manager'
 ```
 
 **packer.nvim**
 
 ```lua
-use { 'yourname/vim-dialogue-manager' }
+use { 'SodoMita/vim-dialogue-manager' }
 ```
 
 **lazy.nvim**
 
 ```lua
-{ 'yourname/vim-dialogue-manager', ft = 'dialogue' }
+{ 'SodoMita/vim-dialogue-manager', ft = 'dialogue' }
 ```
 
 **Vim 8+ packages**
 
 ```sh
-git clone https://github.com/yourname/vim-dialogue-manager \
+git clone https://github.com/SodoMita/vim-dialogue-manager \
   ~/.vim/pack/plugins/start/vim-dialogue-manager
 ```
 
